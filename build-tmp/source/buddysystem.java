@@ -12,9 +12,11 @@ import java.io.InputStream;
 import java.io.OutputStream; 
 import java.io.IOException; 
 
-public class springtesting extends PApplet {
+public class buddysystem extends PApplet {
 
+//declaring group that manages the particles
 Group group;
+
 public void setup(){
 	group = new Group();
 	size(displayWidth, displayHeight-100);
@@ -32,53 +34,56 @@ public void draw(){
 }
 
 public void mousePressed(){
-	group.addSpring(new Spring(mouseX, mouseY));
+
+	//add new particle to the particles list
+	group.addParticle(new Particle(mouseX, mouseY));
 }
 
 public void keyPressed(){
+	//reset buddies and delete fly-away particles
 	group.clearBuddies();
 }
 class Group {
 	
-//a list of spring objects
-ArrayList<Spring> springs;
+//a list of particle objects
+ArrayList<Particle> particles;
 	
 	//CONSTRUCTOR
 	Group(){
-		springs = new ArrayList<Spring>(); //initialize the arraylist
+		particles = new ArrayList<Particle>(); //initialize the arraylist
 	}
 	
  	public void run(){	
- 		//passing the entire list of springs to each spring individually
- 		for (Spring b : springs){
-			b.run(springs);
+ 		//passing the entire list of particles to each particle individually
+ 		for (Particle b : particles){
+			b.run(particles);
  		}
  	}
 
-	public void addSpring(Spring b){
-		//adds a spring to the springs array
-		springs.add(b);
+	public void addParticle(Particle b){
+		//adds a particle to the particles array
+		particles.add(b);
 	}
 
 	public void clearBuddies(){
 		// deleting all budies from all buddylists
-		for (Spring b : springs){
+		for (Particle b : particles){
 			b.buddies.clear();
  		}
 
- 		//removing springs outside the canvas
- 		for (int i = 0; i < springs.size(); i++){
+ 		//removing particles outside the canvas
+ 		for (int i = 0; i < particles.size(); i++){
 
-			if (springs.get(i).location.x > width) springs.remove(i);
-			else if (springs.get(i).location.y > height) springs.remove(i);
-			else if (springs.get(i).location.x < 0) springs.remove(i);
-			else if (springs.get(i).location.y < 0) springs.remove(i);
+			if (particles.get(i).location.x > width) particles.remove(i);
+			else if (particles.get(i).location.y > height) particles.remove(i);
+			else if (particles.get(i).location.x < 0) particles.remove(i);
+			else if (particles.get(i).location.y < 0) particles.remove(i);
 
  		}
 	}
 
 };
-class Spring {
+class Particle {
 
 	//internal settijgs
 	boolean  debug = false;
@@ -97,26 +102,26 @@ class Spring {
 	float neighbordistance = 200;
 
 	//Arraylist for the buddysystem
-	ArrayList<Spring> buddies = new ArrayList<Spring>();
+	ArrayList<Particle> buddies = new ArrayList<Particle>();
 	//total number of buddies for each particle
 	int buddyNum = 3;
 
 	//CONSTRUCTOR
-	Spring(float x, float y){
+	Particle(float x, float y){
 		acceleration = new PVector(0,0);
 		velocity = PVector.random2D();
 		velocity.limit(maxspeed);
 		location = new PVector(x,y);
 	}
 
-	// run all relevant methods of Spring.
-	public void run(ArrayList<Spring> springs){
+	// run all relevant methods of Particle.
+	public void run(ArrayList<Particle> particles){
 		borders();
-		move(springs);
+		move(particles);
 		update();
-		if (!keyPressed) addBuddies(springs);
+		if (!keyPressed) addBuddies(particles);
 		display();
-		connect(springs);
+		connect(particles);
 	}
 
 	public void update(){
@@ -125,9 +130,9 @@ class Spring {
 		acceleration.mult(0);
 	}
 
-	public void move(ArrayList<Spring> springs){
-		PVector att = attract(springs);
-		PVector sep = seperate(springs);
+	public void move(ArrayList<Particle> particles){
+		PVector att = attract(particles);
+		PVector sep = seperate(particles);
 
 		//adding headings according to neighbors and buddies
 		//particles wants to be close to their buddies
@@ -140,8 +145,8 @@ class Spring {
 	}
 
 	//drawing connections between buddies
-	public void connect(ArrayList<Spring> springs){
-		for (Spring _other : buddies) {
+	public void connect(ArrayList<Particle> particles){
+		for (Particle _other : buddies) {
 			stroke(0);
 			beginShape();
 				vertex(location.x,location.y);
@@ -154,17 +159,17 @@ class Spring {
 	// checking nearby particles to see if "thus" and any neighbor 
 	// already have the allowed number of buddies
 	// if there is room for another buddy: add to buddy list.
-	public void addBuddies(ArrayList<Spring> springs){
-		for (Spring other : springs){
+	public void addBuddies(ArrayList<Particle> particles){
+		for (Particle other : particles){
 			int check = 0;
 			float d = PVector.dist(location, other.location);
 			if (d > 0 && d < neighbordistance) {
 				if (buddies.size() < buddyNum){
 					check = buddies.indexOf(other);
 					if (check == -1) {
-						int otherIndex = springs.indexOf(other);
-						if (springs.get(otherIndex).buddies.size() < buddyNum){
-							springs.get(otherIndex).buddies.add(this);
+						int otherIndex = particles.indexOf(other);
+						if (particles.get(otherIndex).buddies.size() < buddyNum){
+							particles.get(otherIndex).buddies.add(this);
 							buddies.add(other);
 						}
 						if (debug) println("1buddies = "+buddies.size());
@@ -176,13 +181,13 @@ class Spring {
 	}
 
 	// find heading in opposite direction of where neighbors are
-	public PVector seperate (ArrayList<Spring> springs){
+	public PVector seperate (ArrayList<Particle> particles){
 
 		PVector steer = new PVector(0,0,0);
 		int count = 0;
 
-		// for every spring in the list check if it's too close
-		for (Spring other : springs){
+		// for every particle in the list check if it's too close
+		for (Particle other : particles){
 			float d = PVector.dist(location, other.location);
 
 			//if the distance is greater than 0 (0 when checking yourself)
@@ -198,7 +203,7 @@ class Spring {
 			}
 		}
 
-		// Average -- divide by amount of springs in list that are too close
+		// Average -- divide by amount of particles in list that are too close
 		if (count > 0) steer.div((float)count);
 
 		if (steer.mag() > 0){
@@ -228,12 +233,12 @@ class Spring {
 
 	// avaraging the location of all vector nearby to find "desired" location
 	// return vector towards that location
-	public PVector attract(ArrayList<Spring> springs){
+	public PVector attract(ArrayList<Particle> particles){
 
 		PVector sum = new PVector(0,0); // empty vector for accumulating locations
 		int count = 0;
 
-		for (Spring other : buddies) {
+		for (Particle other : buddies) {
 				sum.add(other.location);
 				count++;
 		}
@@ -273,7 +278,7 @@ class Spring {
 	}
 };
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "springtesting" };
+    String[] appletArgs = new String[] { "buddysystem" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {

@@ -1,4 +1,6 @@
+//declaring group that manages the particles
 Group group;
+
 void setup(){
 	group = new Group();
 	size(displayWidth, displayHeight-100);
@@ -16,9 +18,12 @@ void draw(){
 }
 
 void mousePressed(){
-	group.addSpring(new Spring(mouseX, mouseY));
+
+	//add new particle to the particles list
+	group.addParticle(new Particle(mouseX, mouseY));
 }
 
 void keyPressed(){
+	//reset buddies and delete fly-away particles
 	group.clearBuddies();
 }

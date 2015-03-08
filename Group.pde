@@ -1,38 +1,38 @@
 class Group {
 	
-//a list of spring objects
-ArrayList<Spring> springs;
+//a list of particle objects
+ArrayList<Particle> particles;
 	
 	//CONSTRUCTOR
 	Group(){
-		springs = new ArrayList<Spring>(); //initialize the arraylist
+		particles = new ArrayList<Particle>(); //initialize the arraylist
 	}
 	
  	void run(){	
- 		//passing the entire list of springs to each spring individually
- 		for (Spring b : springs){
-			b.run(springs);
+ 		//passing the entire list of particles to each particle individually
+ 		for (Particle b : particles){
+			b.run(particles);
  		}
  	}
 
-	void addSpring(Spring b){
-		//adds a spring to the springs array
-		springs.add(b);
+	void addParticle(Particle b){
+		//adds a particle to the particles array
+		particles.add(b);
 	}
 
 	void clearBuddies(){
 		// deleting all budies from all buddylists
-		for (Spring b : springs){
+		for (Particle b : particles){
 			b.buddies.clear();
  		}
 
- 		//removing springs outside the canvas
- 		for (int i = 0; i < springs.size(); i++){
+ 		//removing particles outside the canvas
+ 		for (int i = 0; i < particles.size(); i++){
 
-			if (springs.get(i).location.x > width) springs.remove(i);
-			else if (springs.get(i).location.y > height) springs.remove(i);
-			else if (springs.get(i).location.x < 0) springs.remove(i);
-			else if (springs.get(i).location.y < 0) springs.remove(i);
+			if (particles.get(i).location.x > width) particles.remove(i);
+			else if (particles.get(i).location.y > height) particles.remove(i);
+			else if (particles.get(i).location.x < 0) particles.remove(i);
+			else if (particles.get(i).location.y < 0) particles.remove(i);
 
  		}
 	}
